@@ -42,7 +42,7 @@ RabbitMQ 环境变量一般带有 RABBITMQ_ 这样的一个前置, 比如: RABBI
 |RABBITMQ_CONSOLE_LOG |Windows Service:| Set this variable to new or reuse to redirect console output from the server to a file named%RABBITMQ_SERVICENAME%.debug in the default RABBITMQ_BASE directory.
 If not set, console output from the server will be discarded (default)
 new A new file will be created each time the service starts
-reuse The file will be overwritten each time the service starts.
+reuse The file will be overwritten each time the service starts.|
 |RABBITMQ_CTL_ERL_ARGS | None | Parameters for the erl command used when invoking rabbitmqctl. This should be overridden for debugging purposes only.|
 |RABBITMQ_SERVER_ERL_ARGS |Linux: "+K true +A30 +P 1048576 -kernel inet_default_connect_options [{nodelay,true}]"
 Windows: None|Standard parameters for the erl command used when invoking the RabbitMQ Server. This should be overridden for debugging purposes only.|
