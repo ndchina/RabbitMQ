@@ -34,10 +34,10 @@ RabbitMQ 环境变量一般带有 RABBITMQ_ 这样的一个前置, 比如: RABBI
 
 | Name        | Default | Description|
 | ------------- |:-------------|:-----|
-|RABBITMQ_NODE_IP_ADDRESS | 空字符串代表绑定到所有网络接口上，也就是 0.0.0.0 | Change this if you only want to bind to one network interface.|
-|RABBITMQ_NODE_PORT | 5672 | |
-|RABBITMQ_DIST_PORT | RABBITMQ_NODE_PORT + 20000 | Port to use for clustering. Ignored if your config file setsinet_dist_listen_min or inet_dist_listen_max|
-|RABBITMQ_NODENAME | Linux:rabbit@$HOSTNAME  Windows:rabbit@%COMPUTERNAME%| "The node name should be unique per erlang-node-and-machine combination. To run multiple nodes|
+|RABBITMQ_NODE_IP_ADDRESS | 空字符串代表绑定到所有网络接口上，也就是 0.0.0.0 |当你想让 Server 只绑定到特定的网口上的时候, 可以使用此参数设定|
+|RABBITMQ_NODE_PORT | 5672 |默认使用 5672 端口服务 |
+|RABBITMQ_DIST_PORT | RABBITMQ_NODE_PORT + 20000 | 设置集群模式的端口, 但如果你在配置文件中设定了inet_dist_listen_min 或者 inet_dist_listen_max 的值, 此参数的配置可能会被忽略|
+|RABBITMQ_NODENAME | Linux:rabbit@$HOSTNAME  Windows:rabbit@%COMPUTERNAME%| 当在集群模式中运行多个 node 的时候, 此参数可以配置 node name, 每一个 node name 必须是唯一的|
 |RABBITMQ_SERVICENAME | Windows Service: RabbitMQ | The name of the installed service. This will appear in services.msc.|
 |RABBITMQ_CONSOLE_LOG |Windows Service:| Set this variable to new or reuse to redirect console output from the server to a file named%RABBITMQ_SERVICENAME%.debug in the default RABBITMQ_BASE directory.  If not set, console output from the server will be discarded (default).  new A new file will be created each time the service starts.  reuse The file will be overwritten each time the service starts.|
 |RABBITMQ_CTL_ERL_ARGS | None | Parameters for the erl command used when invoking rabbitmqctl. This should be overridden for debugging purposes only.|
@@ -45,8 +45,57 @@ RabbitMQ 环境变量一般带有 RABBITMQ_ 这样的一个前置, 比如: RABBI
 Windows: None|Standard parameters for the erl command used when invoking the RabbitMQ Server. This should be overridden for debugging purposes only.|
 |RABBITMQ_SERVER_START_ARGS | None | Extra parameters for the?erl?command used when invoking the RabbitMQ Server. This will not overrideRABBITMQ_SERVER_ERL_ARGS.|
 
+另外还有一些环境变量可以设置:[数据库、日志、插件、配置文件的位置等信息](http://www.rabbitmq.com/relocate.html)
 ## 自定义配置
 RabbitMQ 的配置文件路径是:/etc/rabbitmq/rabbitmq.config　
+### The rabbitmq.config File
+RabbitMQ 的配置文件可以配置 RabbitMQ Server 、Erlang 的服务以及 RabbitMQ 的插件等内容。这是一个标准的 erlang 配置文件, 更多 erlang 配置的内容参见[这里](http://www.erlang.org/doc/man/config.html)
+
+配置文件举例:
+```erlang
+[
+    {mnesia, [{dump_log_write_threshold, 1000}]},
+    {rabbit, [{tcp_listeners, [5673]}]}
+  ].
+```
+这个配置文件中主要修改了两项内容:
+- dump_log_write_threshold 默认值是 100 , 增加到了 1000
+- tcp_listeners 默认是 5672 改成了 5673
+### RabbitMQ 的配置文件和环境变量文件一般保存在如下位置
+在 Unix-base system (包括 Linux, MacOSX) RabbitMQ 的环境变量可以通过 rabbitmq-env.conf 来定义.这个文件的位置在:
+* Linux - $RABBITMQ_HOME/etc/rabbitmq/
+* Debian - /etc/rabbitmq/
+* RPM - /etc/rabbitmq/
+* Mac OS X (Macports) - ${install_prefix}/etc/rabbitmq/, the Macports prefix is usually /opt/local
+* Windows - %APPDATA%\RabbitMQ\
+如果 rabbitmq-env.conf  文件不存在你可以手动的创建文件, 但在 windows 中 rabbitmq-env.conf 是不被使用的.
+如果 rabbitmq.config 文件不存在, 你可以手动创建文件. 你也可以通过在 rabbitmq-env.conf 里面设置 RABBITMQ_CONFIG_FILE 环境变量改变 rabbitmq.config 的默认位置, 配置文件修改后重启 RabbitMQ  服务新的配置即可生效
+
+### 示例配置文件
+RabbiMQ 默认提供了一个示例配置文件, 这个配置文件叫做: rabbitmq.config.example . 大多数的配置参数都可以在这个配置文件中看到配置方法.并在配置文件中我们添加了很多注释帮助你来理解每一个配置项的意义.
+在大多数的发行版本中示例配置文件都在默认的配置文件的位置处, 但是 Debian 和 RPM 打包的 RabbitMQ 程序不能这样做, 所以通过这两个方式安装的用户需要在 /usr/share/doc/rabbitmq-server/ 或 /usr/share/doc/rabbitmq-server-3.3.5/ 中找到示例文件, 注意把 3.3.5 换成你安装的版本号.
+
+### RabbitMQ 可以配置的参数
+可配置的参数列举如下
+
+| Key|  Description|
+| -------------|:-----|
+| tcp_listeners| List of ports on which to listen for AMQP connections (without SSL). Can contain integers (meaning "listen on all interfaces") or tuples such as {"127.0.0.1", 5672} to listen on a single interface.  Default: [5672] |
+| ssl_listeners| As above, for SSL connections.  Default: []|
+| ssl_options| SSL configuration. See the [SSL documentation](http://www.rabbitmq.com/ssl.html#enabling-ssl).  Default: []
+| vm_memory_high_watermark|Memory threshold at which the flow control is triggered. See the [memory-based flow control](http://www.rabbitmq.com/memory.html) documentation.  Default: 0.4|
+| vm_memory_high_watermark_paging_ratio | Fraction of the high watermark limit at which queues start to page messages out to disc to free up memory. See the [memory-based flow control](http://www.rabbitmq.com/memory.html) documentation.  Default: 0.5|
+| disk_free_limit | Disk free space limit of the partition on which RabbitMQ is storing data. When available disk space falls below this limit, flow control is triggered. The value may be set relative to the total amount of RAM (e.g. {mem_relative, 1.0}). The value may also be set to an integer number of bytes. By default free disk space must exceed 50MB. See the [memory-based flow control](http://www.rabbitmq.com/memory.html) documentation.  Default: 50000000 |
+| log_levels | Controls the granularity of logging. The value is a list of log event category and log level pairs.
+The level can be one of 'none' (no events are logged), 'error' (only errors are logged), 'warning' (only errors and warning are logged), or 'info' (errors, warnings and informational messages are logged).
+At present there are three categories defined. Other, currently uncategorised, events are always logged.
+The categories are:
+- connection - for all events relating to network connections
+- mirroring - for all events relating to [mirrored queues](http://www.rabbitmq.com/ha.html)
+- federation - for all events relating to [federation](http://www.rabbitmq.com/federation.html)
+Default: [{connection, info}] |
+
+
 
 ## 参考文献
 * [RabbitMQ-configure](http://www.rabbitmq.com/configure.html)
