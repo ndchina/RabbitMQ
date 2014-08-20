@@ -33,7 +33,7 @@ RabbitMQ 环境变量一般带有 RABBITMQ_ 这样的一个前置, 比如: RABBI
 这三种变量的优先级是: shell 方式指定的变量 > rabbitmq-env.conf 配置的变量 > 默认环境变量值, 并且相同名称的变量高优先级的变量会覆盖低优先级的变量值.  RabbitMQ 可用的环境变量如下:
 
 | Name        | Default | Description|
-| ------------- |:-------------:| -----:|
+| ------------- |:-------------:|:-----|
 |RABBITMQ_NODE_IP_ADDRESS | the empty string - meaning bind to all network interfaces. | Change this if you only want to bind to one network interface.|
 |RABBITMQ_NODE_PORT | 5672 | |
 |RABBITMQ_DIST_PORT | RABBITMQ_NODE_PORT + 20000 | Port to use for clustering. Ignored if your config file setsinet_dist_listen_min or inet_dist_listen_max|
