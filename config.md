@@ -88,7 +88,19 @@ RabbiMQ 默认提供了一个示例配置文件, 这个配置文件叫做: rabbi
 | disk_free_limit | Disk free space limit of the partition on which RabbitMQ is storing data. When available disk space falls below this limit, flow control is triggered. The value may be set relative to the total amount of RAM (e.g. {mem_relative, 1.0}). The value may also be set to an integer number of bytes. By default free disk space must exceed 50MB. See the [memory-based flow control](http://www.rabbitmq.com/memory.html) documentation.  Default: 50000000 |
 | log_levels | Controls the granularity of logging. The value is a list of log event category and log level pairs.  The level can be one of 'none' (no events are logged), 'error' (only errors are logged), 'warning' (only errors and warning are logged), or 'info' (errors, warnings and informational messages are logged).  At present there are three categories defined. Other, currently uncategorised, events are always logged.  The categories are: 1) connection - for all events relating to network connections 2) mirroring - for all events relating to [mirrored queues](http://www.rabbitmq.com/ha.html) 3) federation - for all events relating to [federation](http://www.rabbitmq.com/federation.html)
 Default: [{connection, info}] |
-
+| frame_max | Maximum permissible size of a frame (in bytes) to negotiate with clients. Setting to 0 means "unlimited" but will trigger a bug in some QPid clients. Setting a larger value may improve throughput; setting a smaller value may improve latency.  Default: 131072 |
+| channel_max | Maximum permissible number of channels to negotiate with clients. Setting to 0 means "unlimited". Using more channels increases memory footprint of the broker.  Default: 0|
+| heartbeat | Value representing the heartbeat delay, in seconds, that the server sends in the connection.tune frame. If set to 0, heartbeats are disabled. Clients might not follow the server suggestion, see the [AMQP reference](http://www.rabbitmq.com/amqp-0-9-1-reference.html#connection.tune) for more details. Disabling heartbeats might improve performance in situations with a great number of connections, but might lead to connections dropping in the presence of network devices that close inactive connections.  Default: 580 |
+| default_vhost | Virtual host to create when RabbitMQ creates a new database from scratch. The exchange amq.rabbitmq.log will exist in this virtual host. Default: <<"/">> |
+| default_vhost | User name to create when RabbitMQ creates a new database from scratch.  Default: <<"guest">>|
+| default_pass | Password for the default user.  Default: <<"guest">>|
+| default_user_tags | Tags for the default user.  Default: [administrator]|
+| default_permissions | [Permissions](http://www.rabbitmq.com/access-control.html) to assign to the default user when creating it.  Default: [<<".*">>, <<".*">>, <<".*">>]|*
+| loopback_users | List of users which are only permitted to connect to the broker via a loopback interface (i.e. localhost).  If you wish to allow the default guest user to connect remotely, you need to change this to [].  Default: [<<"guest">>] |
+| cluster_nodes | Set this to cause clustering to happen automatically when a node starts for the very first time. The first element of the tuple is the nodes that the node will try to cluster to. The second element is either disc or ram and determines the node type.  Default: {[], disc}|
+| server_properties | List of key-value pairs to announce to clients on connection.  Default: [] |
+| collect_statistics | Statistics collection mode. Primarily relevant for the [management plugin](http://www.rabbitmq.com/management.html#statistics-interval). Options are:  1) none (do not emit statistics events)   2) coarse (emit per-queue / per-channel / per-connection statistics)   3) fine (also emit per-message statistics)  You probably don't want to change this yourself.  Default: none|
+| collect_statistics_interval | Statistics collection interval in milliseconds. Primarily relevant for the management plugin.  Default: 5000|
 
 
 ## 参考文献
