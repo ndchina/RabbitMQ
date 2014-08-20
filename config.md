@@ -39,10 +39,7 @@ RabbitMQ 环境变量一般带有 RABBITMQ_ 这样的一个前置, 比如: RABBI
 |RABBITMQ_DIST_PORT | RABBITMQ_NODE_PORT + 20000 | Port to use for clustering. Ignored if your config file setsinet_dist_listen_min or inet_dist_listen_max|
 |RABBITMQ_NODENAME | Linux:rabbit@$HOSTNAME  Windows:rabbit@%COMPUTERNAME%| "The node name should be unique per erlang-node-and-machine combination. To run multiple nodes|
 |RABBITMQ_SERVICENAME | Windows Service: RabbitMQ | The name of the installed service. This will appear in services.msc.|
-|RABBITMQ_CONSOLE_LOG |Windows Service:| Set this variable to new or reuse to redirect console output from the server to a file named%RABBITMQ_SERVICENAME%.debug in the default RABBITMQ_BASE directory.
-If not set, console output from the server will be discarded (default)
-new A new file will be created each time the service starts
-reuse The file will be overwritten each time the service starts.|
+|RABBITMQ_CONSOLE_LOG |Windows Service:| Set this variable to new or reuse to redirect console output from the server to a file named%RABBITMQ_SERVICENAME%.debug in the default RABBITMQ_BASE directory.  If not set, console output from the server will be discarded (default).  new A new file will be created each time the service starts.  reuse The file will be overwritten each time the service starts.|
 |RABBITMQ_CTL_ERL_ARGS | None | Parameters for the erl command used when invoking rabbitmqctl. This should be overridden for debugging purposes only.|
 |RABBITMQ_SERVER_ERL_ARGS |Linux: "+K true +A30 +P 1048576 -kernel inet_default_connect_options [{nodelay,true}]"
 Windows: None|Standard parameters for the erl command used when invoking the RabbitMQ Server. This should be overridden for debugging purposes only.|
